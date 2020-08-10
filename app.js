@@ -1,102 +1,70 @@
 const prompt = require('prompt');
-const emailCheck = (email)=>{
-    const emailRegex = /(^[\w-\.]+)@([\w-\.])+[\w-]{2,3}/gmi
-    const result = email.match(emailRegex)
-    return !(result == null) ? true : false
-    
+let validatorObj = {
+    email: {
+        validator: /(^[\w-\.]+)@([\w-\.])+[\w-]{2,3}/gmi,
+        successMessage: "email is valid",
+        errorMessage: "email is invalid"
+    },
+    url: {
+        validator: /(http|https):[\/\/]{2}[\w-.]{1,}[\.]([\w-.]){3,}/gmi,
+        successMessage: "url is valid",
+        errorMessage: "url is invalid"
+    },
+    address: {
+        validator: /^No\s\d[,]((\s|.)([\w- .]+[,])){2,}(\s|.)[\w .]+\.$/gmi,
+        successMessage: "address is valid",
+        errorMessage: "address is invalid"
+    },
+    fullname: {
+        validator: /[\w.]{2,}/gmi,
+        successMessage: "fullname is valid",
+        errorMessage: "fullname is invalid"
+    },
+    username: {
+        validator: /[\w\d]+/gmi,
+        successMessage: "username is valid",
+        errorMessage: "username is invalid"
+    },
+    dob: {
+        validator: /(([\d]){2}[-]){2}((\d){4})/gmi,
+        successMessage: "dob is valid",
+        errorMessage: "dob is invalid"
+    }
 }
 
-const urlCheck = (url)=>{
-    const urlRegex = /(http|https):[\/\/]{2}[\w-.]{1,}[\.]([\w-.]){3,}/gmi
-    //(http|https):[\/\/]{2}[\w-.]{1,}[\.]([\w-.]){3,}([\/]([\w-.])+)+
-    const result = url.match(urlRegex)
-    return !(result == null) ? true : false
-}
-
-const addressCheck = (address) => {
-    const addressRegex = /^No\s\d[,](\s|.)+[,](\s|.)+[,](\s|.)+\.$/gmi
-    //^No\s\d[[:punct:]](\s|.)+[[:punct:]](\s|.)+[[:punct:]](\s|.)+\.$
-    const result = address.match(addressRegex);
-    return !(result == null) ? true : false
-}
-
-const fullnameCheck = (fullname) => {
-    const fullnameRegex = /[\w.]{2,}/gmi
-    const result = fullname.match(fullnameRegex)
-    return !(result == null) ? true : false
-}
-
-const usernameCheck = (username) => {
-    const usernameRegex = /[\w\d]+/gmi
-    const result = username.match(usernameRegex)
-    return !(result == null) ? true : false
-}
-
-const dateOfBirthCheck = (dob) => {
-    let dateOfBirthRegex = /(([\d]){2}[-]){2}((\d){4})/gmi
-    const result = dob.match(dateOfBirthRegex)
-    return !(result == null) ? true : false
-
-}
-
-
-//var searchValue = new RegExp(query, 'gi')
-//then you do searchValue.test(the test string);
-const validator = ({fullname, email, username, dob, website,address})=>{
-    if(emailCheck(email)){
-        console.log(email , " is a valid email")
-    }else{
-        console.log(email , " is not a valid email")
-    }
-
-
-    if(urlCheck(website)){
-        console.log(website, ' is  a valid website')
-    }else{
-        console.log(website, ' is  not a valid website')
-    }
-
-
-    if(addressCheck(address)){
-        console.log(address, ' is a valid address')
-    }else{
-        console.log(address, ' is not a valid address')
-    }
-
-
-    if(fullnameCheck(fullname)){
-        console.log(fullname, ' is a valid name')
-    }else{
-        console.log(fullname, ' is not a valid name')
-    }
-
-
-    if(usernameCheck(username)){
-        console.log(username, ' is a valid username');
-    }else{
-        console.log(username, ' is not a valid username');
-    }
-
-
-    if(dateOfBirthCheck(dob)){
-        console.log(dob , ' is a valid date of birth')
-    }else{
-        console.log(dob , ' is a not valid date of birth')
-    }
+function validator({validatorObj, userInfo}){
+    Object.keys(validatorObj).forEach(key => {
+        const field = validatorObj[key]
+        const validatorResult = userInfo[key].match(field.validator)
+        if(validatorResult !== null){
+            console.log(field.successMessage)
+        }else{
+            console.error(field.errorMessage)
+        }
+    })
 }
 
 prompt.start();
-prompt.get(['fullname', 'email', 'username', 'dob', 'website', 'address'], function (err, result) {
+prompt.get(['fullname', 'email', 'username', 'dob', 'url', 'address'], function (err, result) {
     if(err){
-        console.log('an internal server error occured')
+        console.log('an internal server error occurred')
     }else{
-        validator({
+        const userInfo = {
             fullname: result.fullname,
             email: result.email,
             username: result.username,
             dob: result.dob,
-            website: result.website,
+            url: result.url,
             address: result.address
-        })
+        }
+        validator({userInfo, validatorObj})
     }
 });
+//sample data = {
+//     fullname: "Makwe kelvin",
+//     email: "kelvinmakwe@gmail.com",
+//     username: "kelvin001",
+//     dob: "03-04-2020",
+//     url: "http://kelvinmakwe.com",
+//     address: "no 4, evangel-close, port-harcourt, rivers state."
+//}
